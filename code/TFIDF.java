@@ -59,37 +59,37 @@ public class TFIDF {
 
     public static class TFIDFReducer extends Reducer<Text, Text, Text, Text> {
         protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-                // 初始化单词所在文件的总数
-                Integer count = 0;
-                // 使用一个 List 来存储文件名-词频对
-                List<String> fileList = new ArrayList<>();
-                // 对 key 是一样的单词, 将统计的文件名和词频存入 List 中，该单词出现文件数加一
-                for (Text value : values) {
-                    fileList.add("(" + value + ")");
-                    count += 1;
-                }
-                // 计算 IDF
-                double idf = (double)Math.log((double)(FileCount)/count);
-                // 最后输出汇总后的结果, 每个单词只会输出一次
-                // 紧跟着该单词所在的文件与在文件中的词频, 以逗号分隔
-                context.write(key, new Text(String.format("%.2f", idf) + "=" + String.join(", ", fileList)));
+            // 初始化单词所在文件的总数
+            Integer count = 0;
+            // 使用一个 List 来存储文件名-词频对
+            List<String> fileList = new ArrayList<>();
+            // 对 key 是一样的单词, 将统计的文件名和词频存入 List 中，该单词出现文件数加一
+            for (Text value : values) {
+                fileList.add("(" + value + ")");
+                count += 1;
+            }
+            // 计算 IDF
+            double idf = (double)Math.log((double)(FileCount)/count);
+            // 最后输出汇总后的结果, 每个单词只会输出一次
+            // 紧跟着该单词所在的文件与在文件中的词频, 以逗号分隔
+            context.write(key, new Text(String.format("%.2f", idf) + "=" + String.join(", ", fileList)));
         }
     }
 
     //Main
     public static void main(String[] args) throws Exception {
-        //tongji
-	Integer count = 0;
-	File fd = new File(args[0]);
-	File list[] = fd.listFiles();
-	for(int i = 0; i < list.length; i++) {
-	    if(list[i].isFile()) {
-		count++;
-	    }
-	}
-	FileCount = count;
+        //统计文件数量
+        Integer count = 0;
+        File fd = new File(args[0]);
+        File list[] = fd.listFiles();
+        for(int i = 0; i < list.length; i++) {
+            if(list[i].isFile()) {
+            count++;
+            }
+        }
+        FileCount = count;
 
-	// 创建配置对象
+        // 创建配置对象
         Configuration conf = new Configuration();
         // 创建Job对象
         Job job = Job.getInstance(conf, "TFIDF");
